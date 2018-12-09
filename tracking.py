@@ -43,6 +43,12 @@ points.append(p0)
 # Create a mask image for drawing purposes
 mask = np.zeros_like(old_frame)
 
+min_x = old_frame.shape[0]
+max_x = -1
+
+min_y = old_frame.shape[0]
+max_y = -1
+
 while(True):
     # Capture frame-by-frame
     ret, frame = cap.read()
@@ -53,7 +59,14 @@ while(True):
     #plt.show()
     # calculate optical flow
     p1, st, err = cv2.calcOpticalFlowPyrLK(old_gray, frame_gray, p0, None, **lk_params)
-    #input("escriba algo: (:v)")
+
+    if (p1[0,0,0] > max_x): max_x = p1[0,0,0]
+    if (p1[0,0,1] > max_y): max_y = p1[0,0,1]
+    if (p1[0,0,0] < min_x): min_x = p1[0,0,0]
+    if (p1[0,0,1] < min_y): min_y = p1[0,0,1]
+
+    print(min_x, max_x, min_y, max_y)
+    input("escriba algo: (:v)")
     # Select good points
     #print(p1)
     points.append(p1)
@@ -66,6 +79,10 @@ while(True):
         mask = cv2.line(mask, (a,b),(c,d), color[i].tolist(), 2)
         frame = cv2.circle(frame,(a,b),5,color[i].tolist(),-1)
     img = cv2.add(frame,mask)
+    cv2.circle(img,(min_x,min_y),6, (0,0,255),-1)
+    cv2.circle(img,(max_x,min_y),6, (0,0,255),-1)
+    cv2.circle(img,(int((min_x + max_x)/2),max_y),6, (0,0,255),-1)
+    
     cv2.imshow('frame',img)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
