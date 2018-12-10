@@ -131,7 +131,7 @@ while(True):
     #draw(img, x1, y1, ox, oy,  y1-y0)
     for i in range(x1.shape[0]):
         c = tuple(map(int, color[i]))
-        cv2.arrowedLine(img, (x1[i], y1[i]),(int(x1[i] + 5*(x1[i]-x0[i])), int(y1[i] + 5*(y1[i]-y0[i]))), c, 4)
+        cv2.arrowedLine(img, (x1[i], y1[i]),(int(x1[i] + 6*(x1[i]-x0[i])), int(y1[i] + 6*(y1[i]-y0[i]))), c, 4)
 
     # Add labels
     for i in range(x1.shape[0]):
