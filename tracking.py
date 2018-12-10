@@ -51,7 +51,7 @@ points = []
 old_gray = cv2.cvtColor(old_frame, cv2.COLOR_BGR2GRAY)
 
 
-p0 = get_points(old_gray)
+p0, radious = get_points(old_gray)
 #p0 = np.array([[[100,263]],[[362,266]]], dtype = np.float32)
 
 points.append(p0)
@@ -153,6 +153,7 @@ while(True):
     #draw(img, x1, y1, ox, oy,  y1-y0)
     for i in range(x1.shape[0]):
         c = tuple(map(int, color[i]))
+        cv2.circle(img,(x1[i],y1[i]),radious[i], c, 2)    
         cv2.arrowedLine(img, (x1[i], y1[i]),(int(x1[i] + 6*(x1[i]-x0[i])), int(y1[i] + 6*(y1[i]-y0[i]))), c, 4)
 
     # Add labels

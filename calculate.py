@@ -9,7 +9,8 @@ def get_points(gray):
     circles = cv2.HoughCircles(gray,cv2.HOUGH_GRADIENT,1,20,
                             param1=50,param2=30,minRadius=0,maxRadius=55)
     points = circles[0,:,0:2].reshape(circles.shape[1], 1, 2).astype(np.float32)
-    #print(points.shape)
+    radious = list(circles[0,:,2])
+    
     #for i in circles[0,:]:
         # draw the outer circle
     #    cv2.circle(gray,(i[0],i[1]),i[2],(0,255,0),2)
@@ -19,7 +20,7 @@ def get_points(gray):
     #cv2.imshow('detected circles',gray)
     #cv2.waitKey(0)
     #cv2.destroyAllWindows()
-    return points
+    return points, radious
 
 def get_frequency(x, min, max, interval):
     sec = interval
