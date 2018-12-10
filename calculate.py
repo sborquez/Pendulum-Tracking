@@ -51,7 +51,7 @@ def calculate_frec(points, min_x, max_x, min_y, max_y, fps):
         fyi = get_frequency(y, min_y[i], max_y[i], seconds)
         fx.append(fxi)
         fy.append(fyi)
-        print(f"FREC: {fxi}, {fyi}")
+        print(f"Frecuencia_{i}: fx:{fxi:2.4}[Hz]\tfy:{fyi:2.4}[Hz]")
     return fx, fy
 
 def plot(points, range_x, range_y, fps):

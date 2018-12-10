@@ -10,23 +10,24 @@ from calculate import calculate_frec, plot, get_points
 
 video_folder = "videos"
 
-source = "webcam"
-video_name = ""
+source = "video"
+video_name = "video2.mp4"
 
 updates = 1   #
 interval = 3 # Calcular usando 1 segundo de video minimo
 
 if len(sys.argv) == 4:
-    source = "video"
-    video_name = sys.argv[1] 
+    video_name = sys.argv[1]
+    source = "video" if video_name != "webcam" else "webcam"
     interval = int(sys.argv[2])
     updates = int(sys.argv[3])
 
 elif len(sys.argv) == 2:
-    source = "video"
     video_name = sys.argv[1]
+    source = "video" if video_name != "webcam" else "webcam"
 
 print(f"source: {source} {path.join(video_folder,video_name)}")
+print(f"interval to calculate: {interval}\nupdates: {updates}")
 
 if source == "webcam":
     cap = cv2.VideoCapture(0)
@@ -56,7 +57,7 @@ p0 = get_points(old_gray)
 points.append(p0)
 
 # Create some random colors
-color = np.random.randint(0,255,(p0.shape[0],3))
+color = np.random.randint(30,255,(p0.shape[0],3))
 
 x0 = p0[:,0,0]
 y0 = p0[:,0,1]
