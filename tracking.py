@@ -105,6 +105,16 @@ while(True):
     # UPDATE VARIABLES
     if (iframe%interval_frames == 0 and updates):
         _,_ = calculate_frec(points, min_x, max_x, min_y, max_y, fps)
+        
+
+        #x1 = min_x[0], y1 = min_y[0], x2 = max_x[0], y2 = min_y[0]
+        #x3 = min_x[0], y3 = max_y[0]
+        for i in range(min_x.shape[0]):
+            M = [[min_x[i]**2+min_y[i]**2,min_x[i],min_y[i],1],[max_x[i]**2+min_y[i]**2,max_x[i],min_y[i],1],[int((min_x[i] + max_x[i])/2)**2+max_y[i]**2,int((min_x[i] + max_x[i])/2),max_y[i],1]]
+            ox = ((np.linalg.det(np.delete(M,1,1)))/(2*(np.linalg.det(np.delete(M,0,1)))))
+            oy = ((np.linalg.det(np.delete(M,2,1)))/(-2*(np.linalg.det(np.delete(M,0,1)))))
+            c = tuple(map(int, color[i]))
+            cv2.circle(img,(int(ox),int(oy)),6,c,-1)
         updates -= 1
 
     good_new = p1[st==1]
@@ -123,10 +133,21 @@ while(True):
         cv2.circle(img,(min_x[i],min_y[i]),6, c,-1)
         cv2.circle(img,(max_x[i],min_y[i]),6, c,-1)
         cv2.circle(img,(int((min_x[i] + max_x[i])/2),max_y[i]),6, c,-1)
+        
+        M = [[min_x[i]**2+min_y[i]**2,min_x[i],min_y[i],1],[max_x[i]**2+min_y[i]**2,max_x[i],min_y[i],1],[int((min_x[i] + max_x[i])/2)**2+max_y[i]**2,int((min_x[i] + max_x[i])/2),max_y[i],1]]
+        M12 = (np.linalg.det(np.delete(M,1,1)))
+        M11 = (np.linalg.det(np.delete(M,0,1)))
+        M13 = (np.linalg.det(np.delete(M,2,1)))
+        if (M12 > 0):
+            ox = (M12/(2*M11))
+            oy = (M13/(-2*(np.linalg.det(np.delete(M,0,1)))))
+            cv2.circle(img,(int(ox),int(oy)),6,c,-1)
+
+    #x0 = np.linalg.det()
     
     # Draw pendulum center
-    if ox is not None:
-        cv2.circle(img, (ox, oy), 5, (255,255,255),-1)
+    #if ox is not None:
+        #cv2.circle(img, (ox, oy), 5, (255,255,255),-1)
 
     # Draw values
     #draw(img, x1, y1, ox, oy,  y1-y0)
