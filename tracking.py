@@ -89,6 +89,10 @@ while(True):
     x1 = p1[:,0,0]
     y1 = p1[:,0,1]
 
+    #thetas
+    thetas0 = [0,0]
+    thetas1 = [0,0]
+
     # Update x range and y range
     for i in range(x1.shape[0]):            
         if (x1[i] > max_x[i]): max_x[i] = int(x1[i])
@@ -105,16 +109,6 @@ while(True):
     # UPDATE VARIABLES
     if (iframe%interval_frames == 0 and updates):
         _,_ = calculate_frec(points, min_x, max_x, min_y, max_y, fps)
-        
-
-        #x1 = min_x[0], y1 = min_y[0], x2 = max_x[0], y2 = min_y[0]
-        #x3 = min_x[0], y3 = max_y[0]
-        for i in range(min_x.shape[0]):
-            M = [[min_x[i]**2+min_y[i]**2,min_x[i],min_y[i],1],[max_x[i]**2+min_y[i]**2,max_x[i],min_y[i],1],[int((min_x[i] + max_x[i])/2)**2+max_y[i]**2,int((min_x[i] + max_x[i])/2),max_y[i],1]]
-            ox = ((np.linalg.det(np.delete(M,1,1)))/(2*(np.linalg.det(np.delete(M,0,1)))))
-            oy = ((np.linalg.det(np.delete(M,2,1)))/(-2*(np.linalg.det(np.delete(M,0,1)))))
-            c = tuple(map(int, color[i]))
-            cv2.circle(img,(int(ox),int(oy)),6,c,-1)
         updates -= 1
 
     good_new = p1[st==1]
@@ -134,6 +128,10 @@ while(True):
         cv2.circle(img,(max_x[i],min_y[i]),6, c,-1)
         cv2.circle(img,(int((min_x[i] + max_x[i])/2),max_y[i]),6, c,-1)
         
+    
+    # Draw pendulum center
+    for i in range(min_x.shape[0]):
+        c = tuple(map(int, color[i]))
         M = [[min_x[i]**2+min_y[i]**2,min_x[i],min_y[i],1],[max_x[i]**2+min_y[i]**2,max_x[i],min_y[i],1],[int((min_x[i] + max_x[i])/2)**2+max_y[i]**2,int((min_x[i] + max_x[i])/2),max_y[i],1]]
         M12 = (np.linalg.det(np.delete(M,1,1)))
         M11 = (np.linalg.det(np.delete(M,0,1)))
@@ -143,21 +141,25 @@ while(True):
             oy = (M13/(-2*(np.linalg.det(np.delete(M,0,1)))))
             cv2.circle(img,(int(ox),int(oy)),6,c,-1)
 
-    #x0 = np.linalg.det()
-    
-    # Draw pendulum center
-    #if ox is not None:
-        #cv2.circle(img, (ox, oy), 5, (255,255,255),-1)
+            v1 = (ox-x1[i],oy-y1[i])
+            v2 = (ox-(min_x[i] + max_x[i])/2,oy-max_y[i])
+            v0 = (ox-x0[i],oy-y0[i])
+            
+            theta0 = np.rad2deg(np.arccos(np.dot(v0, v2) / (np.linalg.norm(v0) * np.linalg.norm(v2))))
+            theta1 = np.rad2deg(np.arccos(np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))))
+            
+            thetas0[i] = theta0
+            thetas1[i] = theta1
 
     # Draw values
     #draw(img, x1, y1, ox, oy,  y1-y0)
     for i in range(x1.shape[0]):
         c = tuple(map(int, color[i]))
         cv2.arrowedLine(img, (x1[i], y1[i]),(int(x1[i] + 6*(x1[i]-x0[i])), int(y1[i] + 6*(y1[i]-y0[i]))), c, 4)
-
+    
     # Add labels
     for i in range(x1.shape[0]):
-        msg = f"[{i}] pos: ({int(x1[i])},{int(y1[i])})[px]    vel: ({int(x1[i]-x0[i])},{int(y1[i]-y0[i])})[px/frame] theta: -"
+        msg = f"[{i}] pos: ({int(x1[i])},{int(y1[i])})[px] vel: ({int(x1[i]-x0[i])},{int(y1[i]-y0[i])})[px/frame] theta: {int(thetas1[i])}[grad] vel ang: ({(thetas1[i]-thetas0[i])})[grad/frame]"
         c = tuple(map(int, color[i]))
         #print("color:", c)
         cv2.putText(img, msg, (10, 12*(i+1)), cv2.FONT_HERSHEY_SIMPLEX, 0.4, c)
@@ -167,7 +169,7 @@ while(True):
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
-
+    
     # Now update the previous frame and previous points
     old_gray = frame_gray.copy()
     p0 = good_new.reshape(-1,1,2)
